@@ -1,0 +1,153 @@
+/* Sabrhub API Documentation - Custom Style Fixes */
+
+/* Remove/hide problematic square logos from API documentation links */
+.api-card img.api-icon,
+.api-icon,
+img[src*="logo.png"] {
+    display: none !important;
+}
+
+/* Improve Sabrhub logo display in header/navigation */
+.redoc-logo img,
+.logo img,
+[class*="logo"] img {
+    max-height: 40px !important;
+    width: auto !important;
+    object-fit: contain !important;
+    background: transparent !important;
+}
+
+/* Fix logo container styling */
+.redoc-logo,
+.logo-container,
+[class*="logo-container"] {
+    background: transparent !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+/* Improve search bar logo visibility */
+.search-input::before,
+.search-box::before {
+    background-image: url('../images/sabrhub-logo.svg') !important;
+    background-size: 20px 20px !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+}
+
+/* Enhanced code block readability */
+pre,
+code,
+.redoc-code {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+    border: 1px solid #374151 !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    padding: 16px !important;
+}
+
+/* Code samples in right panel */
+.redoc-json code,
+.redoc-code-block code {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+    font-family: "JetBrains Mono", "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace !important;
+}
+
+/* Syntax highlighting improvements */
+.hljs {
+    background: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+.hljs-string,
+.hljs-attr {
+    color: #a7f3d0 !important;
+}
+
+.hljs-number,
+.hljs-literal {
+    color: #fbbf24 !important;
+}
+
+.hljs-keyword,
+.hljs-built_in {
+    color: #60a5fa !important;
+}
+
+.hljs-comment {
+    color: #9ca3af !important;
+    font-style: italic;
+}
+
+/* Remove white background from square logos */
+.api-card,
+.nav-item,
+.menu-item {
+    background: transparent !important;
+}
+
+.api-card img,
+.nav-item img,
+.menu-item img {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Clean up navigation aesthetics */
+.nav-link,
+.menu-item-link {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 12px 16px !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease !important;
+}
+
+.nav-link:hover,
+.menu-item-link:hover {
+    background-color: rgba(0, 102, 204, 0.08) !important;
+    color: #0066CC !important;
+}
+
+/* Professional favicon handling */
+link[rel="icon"],
+link[rel="shortcut icon"] {
+    href: url('./assets/images/favicon.ico') !important;
+}
+
+/* Responsive logo improvements */
+@media (max-width: 768px) {
+    .redoc-logo img,
+    .logo img {
+        max-height: 32px !important;
+    }
+}
+
+/* Custom scrollbar for code blocks */
+pre::-webkit-scrollbar,
+code::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+pre::-webkit-scrollbar-track,
+code::-webkit-scrollbar-track {
+    background: #2d2d2d;
+    border-radius: 4px;
+}
+
+pre::-webkit-scrollbar-thumb,
+code::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 4px;
+}
+
+pre::-webkit-scrollbar-thumb:hover,
+code::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}
