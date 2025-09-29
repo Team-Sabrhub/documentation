@@ -1,0 +1,39 @@
+apis:
+  webex:
+    root: specs/contextsms-webex.yaml
+  teams:
+    root: specs/contextsms-teams.yaml
+  contextregister:
+    root: specs/contextregister.yaml
+
+rules:
+  no-unused-components: error
+  no-undefined-server-variable: error
+  operation-operationId: error
+  tag-description: warn
+  operation-summary: error
+  operation-description: warn
+  parameter-description: warn
+
+theme:
+  openapi:
+    theme:
+      colors:
+        primary:
+          main: '#4C86E4'
+      sidebar:
+        backgroundColor: '#1B2B41'
+      typography:
+        fontFamily: 'Roboto, sans-serif'
+        headings:
+          fontFamily: 'Roboto, sans-serif'
+        fontSize: '16px'
+    htmlTemplate: './assets/redoc-template.html'
+    
+site:
+  title: 'Sabrhub API Documentation Portal'
+  logo:
+    image: './assets/logos/sabrhub-logo.svg'
+    altText: 'Sabrhub'
+    link: 'https://sabrhub.com'
+  favicon: './assets/logos/favicon.png'
