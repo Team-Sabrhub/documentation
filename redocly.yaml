@@ -1,0 +1,122 @@
+# Sabrhub API Documentation - Redocly Enterprise Configuration
+# Domain: context-docs.sabrhub.com | SEO: Disabled | Full Sabrhub Branding
+
+# API Specifications
+apis:
+  webex:
+    root: specs/contextsms-webex.yaml
+  teams:
+    root: specs/contextsms-teams.yaml
+  contextregister:
+    root: specs/contextregister.yaml
+
+# Linting Rules
+rules:
+  no-unused-components: error
+  operation-operationId: error
+  operation-summary: warn
+  operation-description: warn
+  tag-description: warn
+
+# Redocly Enterprise Configuration
+redocly:
+  # Domain Configuration (Enterprise)
+  domain: context-docs.sabrhub.com
+  
+  # SEO Settings - Block Google Indexing
+  seo:
+    title: 'Sabrhub API Documentation Portal'
+    description: 'Internal API documentation for Sabrhub ContextSMS platform - Webex, Teams, and 10DLC messaging'
+    noindex: true
+    nofollow: true
+    robotsContent: 'noindex, nofollow, noarchive, nosnippet'
+    
+  # Site Metadata
+  site:
+    title: 'Sabrhub API Documentation Portal'
+    description: 'Comprehensive API documentation for Sabrhub ContextSMS platform'
+    author: 'Sabrhub Inc.'
+    company: 'Sabrhub Inc.'
+    
+  # Footer Configuration
+  footer:
+    copyrightText: '© 2024 Sabrhub Inc. All rights reserved.'
+    links:
+      - label: 'Privacy Policy'
+        href: 'https://sabrhub.com/privacy'
+      - label: 'Terms of Service'
+        href: 'https://sabrhub.com/terms'
+      - label: 'Support'
+        href: 'https://support.sabrhub.com'
+      - label: 'Contact'
+        href: 'https://sabrhub.com/contact'
+
+# Complete Sabrhub Theme Configuration
+theme:
+  openapi:
+    # Branding Assets
+    logo: assets/sabrhub-logo.png
+    favicon: assets/logos/sabrhub-favicon.png
+    
+    # Custom Sabrhub Stylesheet
+    additionalCss:
+      - assets/styles.css
+    
+    # Sabrhub Brand Theme
+    theme:
+      # Brand Colors
+      colors:
+        primary:
+          main: '#4C86E4'        # Sabrhub Primary Blue
+          light: '#6FA0F2'       # Light Blue for hover
+          dark: '#3B6DB8'        # Dark Blue for active
+        secondary:
+          main: '#1B2B41'        # Sabrhub Navy
+        accent:
+          main: '#00D4AA'        # Sabrhub Teal
+        text:
+          primary: '#1B2B41'     # Main text
+          secondary: '#6B7280'   # Secondary text
+        background:
+          default: '#FFFFFF'     # Main background
+          paper: '#F9FAFB'       # Card background
+        success:
+          main: '#10B981'        # Success green
+        warning:
+          main: '#F59E0B'        # Warning amber
+        error:
+          main: '#EF4444'        # Error red
+      
+      # Navigation Sidebar
+      sidebar:
+        backgroundColor: '#1B2B41'   # Sabrhub Navy
+        textColor: '#FFFFFF'         # White text
+        activeTextColor: '#00D4AA'   # Sabrhub Teal for active items
+        groupItems:
+          textTransform: 'uppercase'
+        level1Items:
+          textTransform: 'none'
+      
+      # Typography - Inter Font System
+      typography:
+        fontFamily: "'Inter', 'Roboto', 'Helvetica Neue', Arial, sans-serif"
+        fontSize: '16px'
+        lineHeight: 1.6
+        headings:
+          fontFamily: "'Inter', 'Roboto', 'Helvetica Neue', Arial, sans-serif"
+          fontWeight: '600'
+          color: '#1B2B41'
+        code:
+          fontFamily: "'Fira Code', 'Monaco', 'Consolas', monospace"
+          fontSize: '14px'
+          backgroundColor: '#F3F4F6'
+      
+      # Right Panel (Try It)
+      rightPanel:
+        backgroundColor: '#F9FAFB'
+        textColor: '#374151'
+      
+      # Code Blocks
+      codeBlock:
+        backgroundColor: '#1F2937'
+
