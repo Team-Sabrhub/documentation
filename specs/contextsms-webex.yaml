@@ -1,0 +1,762 @@
+openapi: "3.0.3"
+info:
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: ContextSMS Webex Bot API
+  version: 1.0.0
+  contact:
+    name: Sabrhub API Support Team
+    url: https://sabrhub.com/support
+    email: support@sabrhub.com
+  termsOfService: https://sabrhub.com/terms
+  
+  x-api-id: contextsms-webex
+  x-preferred-language: 'curl'
+  description: |
+    # ContextSMS Webex Bot API
+    
+    **Build powerful customer-facing Webex integrations with enterprise messaging capabilities.**
+    
+    ## Key Features
+    - **Enterprise Authentication** - Secure Bearer token authentication
+    - **Enterprise Management** - Create and manage customer organizations
+    - **Phone Number Mapping** - Link phone numbers to Webex identities
+    - **Real-time Webhooks** - Instant message event notifications
+    - **Multi-environment** - Separate development and production environments
+    
+    ## Quick Integration Flow
+    1. **Authenticate** → Get your Bearer token via login
+    2. **Create Enterprise** → Set up customer organization with CSP ID  
+    3. **Add Mapping** → Link phone number to Webex identity
+    4. **Handle Events** → Process incoming webhook notifications
+    
+    ## Base URLs
+    - **Production**: `https://webex-backend.sabrhub.com/v1`
+    - **Development**: `https://webex-backend-dev.sabrhub.com/v1` 
+    - **Authentication**: `https://usermgmt.sabrhub.com/v1`
+    **Note:** Parameters marked with * are required. For detailed instructions, see our [Integration Guide](../content/webex-bot/index.html).
+servers:
+  - url: https://context-webex.sabrhub.com/api/v1
+    description: Production Environment (live) - ContextSMS Webex
+  - url: https://webex-dev-frontend.sabrhub.com/api/v1
+    description: Development Environment (testing) - ContextSMS Webex Dev
+  - url: https://usermgmt-dev.sabrhub.com/v1
+    description: User Management (Auth) - Dev auth (used by sample requests)
+  - url: https://api.redocly.com/mock/contextsms-webex/v1
+    description: Mock Server (Redocly) — public demo / Try-It
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Use Bearer token authentication for all requests.
+        
+        **How to get your API token:**
+        1. Contact Sabrhub Support at support@sabrhub.com
+        2. Provide your use case and integration requirements  
+        3. Receive your API token securely
+        4. Include in requests: `Authorization: Bearer YOUR_TOKEN`
+        
+        **Important Security Notes:**
+        - Never expose tokens in client-side code
+        - Store tokens securely in environment variables
+        - Tokens expire - implement refresh logic
+
+security:
+  - BearerAuth: []
+
+tags: 
+  - name: Authentication
+    description: Endpoints for user login and token management to securely access the API.
+  - name: Enterprise Management
+    description: APIs for creating, retrieving, and deleting enterprises.
+  - name: Mapping Management
+    description: APIs for creating, retrieving and deleting number-to-message-app mappings.
+  - name: CSP-User-Management
+    description: "Operations for creating, removing, and managing CSP users in ContextSMS."
+
+paths:
+  /auth/login:
+    servers:
+      - url: '{um_host}{um_basePath}'
+        description: 'User Management service - always used for authentication regardless of environment.'
+        variables:
+          um_host:
+            default: 'https://usermgmt.sabrhub.com'
+            enum:
+              - 'https://usermgmt.sabrhub.com'
+              - 'https://usermgmt-dev.sabrhub.com'
+          um_basePath:
+            default: '/v1'
+            enum:
+              - '/v1'
+    post:
+      operationId: loginUser
+      tags:
+        - Authentication
+      summary: Authenticate user and return access and refresh tokens
+      description: Authenticate user with credentials and return an accessToken (JWT), refreshToken, and user info on success.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  example: test@email.com
+                password:
+                  type: string
+                  example: 'Ni*nsl$k3n('
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                  accessToken:
+                    type: string
+                  refreshToken:
+                    type: string
+                  expirationTimeInUTC:
+                    type: string
+                    format: date-time
+                  roles:
+                    type: array
+                    items:
+                      type: string
+                  tenantId:
+                    type: string
+                  services:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Invalid credentials or bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+      x-codeSamples:
+        - lang: cURL
+          label: cURL
+          source: |
+            curl -X POST "https://usermgmt.sabrhub.com/v1/auth/getaccesstoken" \
+              -H "Content-Type: application/json" \
+              -H "Accept: application/json" \
+              -d '{
+                "username": "test@email.com",
+                "refreshToken": "<REFRESH_TOKEN>"
+              }'
+
+        - lang: Python
+          label: Python
+          source: |
+            import requests
+
+            url = "https://usermgmt.sabrhub.com/v1/auth/login"
+            response = requests.post(url, json={"username": "test", "password": "12345"})
+            print(response.json())
+        - lang: JavaScript
+          label: JavaScript
+          source: |
+            const axios = require('axios');
+
+            const url = "https://usermgmt.sabrhub.com/v1/auth/login";
+            axios.post(url, { username: "test", password: "12345" })
+              .then(response => {
+                console.log(response.data);
+              })
+              .catch(error => {
+                console.error(error);
+              });
+
+
+
+  /auth/getaccesstoken:
+    servers:
+      - url: '{um_host}{um_basePath}'
+        description: 'User Management service - always used for authentication regardless of environment.'
+        variables:
+          um_host:
+            default: 'https://usermgmt.sabrhub.com'
+            enum:
+              - 'https://usermgmt.sabrhub.com'
+              - 'https://usermgmt-dev.sabrhub.com'
+          um_basePath:
+            default: '/v1'
+            enum:
+              - '/v1'
+    post:
+      operationId: getAccessToken
+      tags:
+        - Authentication
+      summary: Exchange refresh token and return a new access token
+      description: "Use the provided refreshToken to obtain a new accessToken. Returns accessToken, refreshToken and expiration details."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - refreshToken
+              properties:
+                username:
+                  type: string
+                  example: test@email.com
+                refreshToken:
+                  type: string
+                  example: "<REFRESH_TOKEN>"
+      responses:
+        '200':
+          description: Access token refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                  accessToken:
+                    type: string
+                  refreshToken:
+                    type: string
+                  expirationTimeInUTC:
+                    type: string
+                    format: date-time
+                  roles:
+                    type: array
+                    items:
+                      type: string
+                  tenantId:
+                    type: string
+                  services:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Invalid request or refresh token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+      x-codeSamples:
+        - lang: cURL
+          label: cURL
+          source: |
+            curl -X POST "https://usermgmt.sabrhub.com/v1/auth/getaccesstoken" \
+              -H "Content-Type: application/json" \
+              -H "Accept: application/json" \
+              -d '{
+                "username": "test@email.com",
+                "refreshToken": "<REFRESH_TOKEN>"
+              }'
+        - lang: Python
+          label: Python
+          source: |
+            import requests
+
+            url = "https://usermgmt.sabrhub.com/v1/auth/getaccesstoken"
+            response = requests.post(url, json={"username": "test@email.com", "refreshToken": "<REFRESH_TOKEN>"})
+            print(response.json())
+        - lang: JavaScript
+          label: JavaScript
+          source: |
+            const axios = require('axios');
+
+            const url = "https://usermgmt.sabrhub.com/v1/auth/getaccesstoken";
+            axios.post(url, { username: "test@email.com", refreshToken: "<REFRESH_TOKEN>" })
+              .then(response => {
+                console.log(response.data);
+              })
+              .catch(error => {
+                console.error(error);
+              });
+
+  /enterprise/{cspId}:
+    post:
+      operationId: createEnterprise
+      tags:
+        - Enterprise Management
+      summary: Create a new enterprise for a given CSP and return details
+      description: Create a new enterprise record under the specified CSP. Returns the created enterprise object.
+      parameters:
+        - name: cspId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - contact
+                - number
+                - email
+              properties:
+                name:
+                  type: string
+                  description: Name of the enterprise
+                contact:
+                  type: string
+                  description: Enterprise contact name
+                number:
+                  type: string
+                  description: Enterprise contact number
+                email:
+                  type: string
+                  description: Enterprise business admin email
+                defaultMmsSelection:
+                  type: boolean
+                  description: >
+                    Default selection of the mmsEnabled flag when creating NumberMapping.
+                    If MMS feature is Strict or Disabled, follow the feature settings.
+                    If Partial, can be true or false.
+            examples:
+              curl:
+                summary: cURL example
+                value:
+                    name: "test enterprise2"
+                    contact: "Test Contact"
+                    number: "+12223334444"
+                    email: "test@email.com"
+                    defaultMmsSelection: true
+              python:
+                summary: Python example
+                value:
+                    name: "test enterprise2"
+                    contact: "Test Contact"
+                    number: "+12223334444"
+                    email: "test@email.com"
+                    defaultMmsSelection: true
+              javascript:
+                summary: JavaScript (fetch) example
+                value:
+                    name: "test enterprise2"
+                    contact: "Test Contact"
+                    number: "+12223334444"
+                    email: "test@email.com"
+                    defaultMmsSelection: true
+      responses:
+        '201':
+          description: Enterprise created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enterpriseId: "E0000090"
+                name: "test enterprise2"
+                contact: "Test Contact"
+                number: "+12223334444"
+                email: "test@email.com"
+                deleted: false
+                createdDate: 1698446777442
+                updateDate: 1698446777443
+                webexSettings: null
+                numberToMessageAppMaps: null
+                defaultMmsSelection: true
+        '400':
+          description: Bad Request
+
+
+  /enterprise/getenterprise/{enterpriseId}:
+    get:
+      operationId: getEnterpriseById
+      tags:
+        - Enterprise Management
+      summary: Read Single Enterprise
+      description: Retrieve enterprise details by enterpriseId. Returns enterprise object or 404.
+      parameters:
+        - name: enterpriseId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Enterprise found successfully.
+        '404':
+          description: Enterprise not found
+      x-codeSamples:
+        - lang: cURL
+          source: |
+            curl -X GET "https://usermgmt.sabrhub.com/v1/enterprise/getenterprise/{enterpriseId}"
+        - lang: Python
+          source: |
+            import requests
+
+            url = "https://usermgmt.sabrhub.com/v1/enterprise/getenterprise/{enterpriseId}"
+            response = requests.get(url)
+            print(response.json())
+        - lang: JavaScript
+          source: |
+            const url = "https://usermgmt.sabrhub.com/v1/enterprise/getenterprise/{enterpriseId}";
+
+            fetch(url)
+              .then(res => res.json())
+              .then(data => console.log(data))
+              .catch(err => console.error("Error:", err));
+
+  /csp/enterprises/{cspId}:
+    get:
+      operationId: listEnterprisesByCsp
+      tags:
+        - Enterprise Management
+      summary: List enterprises for a specified CSP (supports pagination).
+      description: List enterprises for a specified CSP with pagination support
+      parameters:
+        - name: cspId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Enterprises retrieved successfully.
+        '400':
+          description: Bad request. Invalid query or parameters.
+        '401':
+          description: Unauthorized. Missing or invalid authentication.
+      x-codeSamples:
+        - lang: cURL
+          source: |
+            curl -X GET "https://usermgmt.sabrhub.com/v1/csp/enterprises/{cspId}"
+        - lang: Python
+          source: |
+            import requests
+
+            url = "https://usermgmt.sabrhub.com/v1/csp/enterprises/{cspId}"
+            response = requests.get(url)
+            print(response.json())
+        - lang: JavaScript
+          source: |
+            const url = "https://usermgmt.sabrhub.com/v1/csp/enterprises/{cspId}";
+
+            fetch(url)
+              .then(res => res.json())
+              .then(data => console.log(data))
+              .catch(err => console.error("Error:", err));
+
+  /enterprise/deleteenterprise/{enterpriseId}:
+    delete:
+      operationId: deleteEnterprise
+      tags:
+        - Enterprise Management
+      summary: Delete an enterprise by ID and return operation result
+      description: Delete the enterprise identified by enterpriseId. Returns 204 on success or 404 if not found.
+      parameters:
+        - name: enterpriseId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Enterprise deleted successfully.
+        '400':
+          description: Bad Request.
+        '404':
+          description: Enterprise not found.
+      x-codeSamples:
+        - lang: cURL
+          source: |
+            curl -X DELETE "https://usermgmt.sabrhub.com/v1/enterprise/deleteenterprise/{enterpriseId}"
+        - lang: Python
+          source: |
+            import requests
+
+            url = "https://usermgmt.sabrhub.com/v1/enterprise/deleteenterprise/{enterpriseId}"
+            response = requests.delete(url)
+            print(response.json())
+        - lang: JavaScript
+          source: |
+            const url = "https://usermgmt.sabrhub.com/v1/enterprise/deleteenterprise/{enterpriseId}";
+
+            fetch(url, { method: "DELETE" })
+              .then(res => res.json())
+              .then(data => console.log(data))
+              .catch(err => console.error("Error:", err));
+
+  /mapping/add/{enterpriseId}:
+    post:
+      operationId: addMapping
+      tags:
+        - Mapping Management
+      summary: Create mapping for enterprise and return created mapping
+      description: Create a mapping record associated with enterpriseId. Returns the newly created mapping.
+      parameters:
+        - in: path
+          name: enterpriseId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            examples:
+              curl:
+                summary: cURL
+                value:
+                    name: "test mapping"
+                    number: "+12223334444"
+                    type: "sms"
+
+              python:
+                summary: Python
+                value:
+                    name: "test mapping"
+                    number: "+12223334444"
+                    type: "sms"
+              javascript:
+                summary: JavaScript (fetch)
+                value:
+                    name: "test mapping"
+                    number: "+12223334444"
+                    type: "sms"
+      responses:
+        '200':
+          description: Mapping added successfully
+        '400':
+          description: Bad Request
+        '404':
+          description: Mapping not found
+
+  /mappings/csp/{cspId}:
+    get:
+      operationId: getMappingsByCsp
+      tags:
+        - Mapping Management
+      description: "Return all mapping records associated with the specified CSP (cspId). Supports pagination and optional filters such as page, size and status."
+      summary: Retrieve mappings for a specific CSP with optional filters
+      parameters:
+        - in: path
+          name: cspId
+          required: true
+          schema:
+            type: string
+          description: CSP identifier (e.g. CSP0000003)
+      responses:
+        '200':
+          description: Mappings retrieved successfully.
+        '400':
+          description: Bad Request
+        '404':
+          description: Mappings not found
+      x-codeSamples:
+        - lang: cURL
+          source: |
+            curl -X GET "https://usermgmt.sabrhub.com/v1/mappings/csp/{cspId}"
+        - lang: Python
+          source: |
+            import requests
+
+            url = "https://usermgmt.sabrhub.com/v1/mappings/csp/{cspId}"
+            response = requests.get(url)
+            print(response.json())
+        - lang: JavaScript
+          source: |
+            const url = "https://usermgmt.sabrhub.com/v1/mappings/csp/{cspId}";
+
+            fetch(url)
+              .then(res => res.json())
+              .then(data => console.log(data))
+              .catch(err => console.error("Error:", err));
+  /mappings/enterprise/{enterpriseId}:
+    get:
+      operationId: getMappingsByEnterprise
+      tags:
+        - Mapping Management
+      summary: Retrieve mappings for a specific CSP with optional filters
+      description: Return all mapping records associated with the given CSP (cspId).
+      parameters:
+        - in: path
+          name: enterpriseId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Mappings retrieved successfully.
+        '400':
+          description: Bad Request
+        '404':
+          description: Mappings not found
+      x-codeSamples:
+        - lang: cURL
+          source: |
+            curl -X GET "https://usermgmt.sabrhub.com/v1/mappings/enterprise/{enterpriseId}"
+        - lang: Python
+          source: |
+            import requests
+
+            url = "https://usermgmt.sabrhub.com/v1/mappings/enterprise/{enterpriseId}"
+            response = requests.get(url)
+            print(response.json())
+        - lang: JavaScript
+          source: |
+            const url = "https://usermgmt.sabrhub.com/v1/mappings/enterprise/{enterpriseId}";
+
+            fetch(url)
+              .then(res => res.json())
+              .then(data => console.log(data))
+              .catch(err => console.error("Error:", err));
+
+  /mapping/{mappingId}:
+    delete:
+      operationId: deleteMapping
+      tags:
+        - Mapping Management
+      summary: Delete mapping by mappingId and return operation status
+      description: Delete mapping identified by mappingId. Returns 204 on success or 404 if not found.
+      parameters:
+        - name: mappingId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Mapping deleted successfully
+        '400':
+          description: Bad Request
+        '404':
+          description: Mapping not found
+      x-codeSamples:
+        - lang: cURL
+          source: |
+            curl -X DELETE "https://usermgmt.sabrhub.com/v1/mapping/{mappingId}"
+        - lang: Python
+          source: |
+            import requests
+
+            url = "https://usermgmt.sabrhub.com/v1/mapping/{mappingId}"
+            response = requests.delete(url)
+            print(response.json())
+        - lang: JavaScript
+          source: |
+            const url = "https://usermgmt.sabrhub.com/v1/mapping/{mappingId}";
+
+            fetch(url, { method: "DELETE" })
+              .then(res => res.json())
+              .then(data => console.log(data))
+              .catch(err => console.error("Error:", err));
+  /users/create:
+    post:
+      operationId: createCSPUser
+      summary: Create a new CSP user and return the created user profile
+      description: Create a new CSP user using provided payload. Returns the created user object on success.
+
+      tags:
+        - CSP-User-Management
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+            examples:
+              user:
+                summary: Example user payload
+                value:
+                  email: "newuser@email.com"
+                  password: "StrongP@ssw0rd"
+      x-codeSamples:
+        - lang: cURL
+          label: cURL
+          source: |
+            curl -X POST "https://usermgmt.sabrhub.com/v1/users/create" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "email": "newuser@email.com",
+              "password": "StrongP@ssw0rd"
+            }'
+        - lang: Python
+          label: Python
+          source: |
+            import requests
+
+            url = "https://usermgmt.sabrhub.com/v1/users/create"
+            payload = {
+                "email": "newuser@email.com",
+                "password": "StrongP@ssw0rd"
+            }
+            headers = {"Content-Type": "application/json"}
+
+            response = requests.post(url, json=payload, headers=headers)
+            print(response.json())
+        - lang: JavaScript
+          label: JavaScript (fetch)
+          source: |
+            const url = "https://usermgmt.sabrhub.com/v1/users/create";
+
+            const payload = {
+              email: "newuser@email.com",
+              password: "StrongP@ssw0rd"
+            };
+
+            fetch(url, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload)
+            })
+              .then(res => res.json())
+              .then(data => console.log(data))
+              .catch(err => console.error("Error:", err));
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  email:
+                    type: string
+        '400':
+          description: Bad request – missing or invalid parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
