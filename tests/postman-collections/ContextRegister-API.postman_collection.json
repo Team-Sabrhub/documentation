@@ -1,0 +1,735 @@
+{
+	"info": {
+		"_postman_id": "contextregister-api-collection-003",
+		"name": "ContextRegister API - 10DLC Management",
+		"description": "Comprehensive API tests for ContextRegister API - 10DLC messaging registration and compliance management",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl_dev",
+			"value": "https://cr-dev.sabrhub.com/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "baseUrl_prod",
+			"value": "https://contextregister.sabrhub.com/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "brandId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "campaignId",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Brand Management",
+			"item": [
+				{
+					"name": "Get All Brands (Paginated)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Brands retrieved successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response contains pagination data', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('total_brands');",
+									"    pm.expect(jsonData).to.have.property('page');",
+									"    pm.expect(jsonData).to.have.property('size');",
+									"    pm.expect(jsonData).to.have.property('total_pages');",
+									"});",
+									"",
+									"pm.test('Brands array is present', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('brands');",
+									"    pm.expect(jsonData.brands).to.be.an('array');",
+									"});",
+									"",
+									"pm.test('Brand data structure is correct', function () {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.brands.length > 0) {",
+									"        var brand = jsonData.brands[0];",
+									"        pm.expect(brand).to.have.property('id');",
+									"        pm.expect(brand).to.have.property('name');",
+									"        pm.expect(brand).to.have.property('company_name');",
+									"        pm.expect(brand).to.have.property('user_email');",
+									"        pm.collectionVariables.set('brandId', brand.id);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl_dev}}/api/brands?page=1&size=10",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["api", "brands"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Brand Details by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Brand details retrieved successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Brand details are complete', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('name');",
+									"    pm.expect(jsonData).to.have.property('company_name');",
+									"    pm.expect(jsonData).to.have.property('vertical');",
+									"    pm.expect(jsonData).to.have.property('brand_relationship');",
+									"});",
+									"",
+									"pm.test('Contact information is present', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('user_email');",
+									"    pm.expect(jsonData).to.have.property('support_email');",
+									"    pm.expect(jsonData).to.have.property('support_phone');",
+									"});",
+									"",
+									"pm.test('Address information is complete', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('street_address');",
+									"    pm.expect(jsonData).to.have.property('city');",
+									"    pm.expect(jsonData).to.have.property('state');",
+									"    pm.expect(jsonData).to.have.property('zip_code');",
+									"    pm.expect(jsonData).to.have.property('country');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl_dev}}/api/brands/{{brandId}}",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["api", "brands", "{{brandId}}"]
+						}
+					}
+				},
+				{
+					"name": "Create New Brand",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Brand created successfully', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Response contains new brand ID', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.collectionVariables.set('brandId', jsonData.id);",
+									"});",
+									"",
+									"pm.test('Brand data matches input', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.company_name).to.eql('Test Business LLC');",
+									"    pm.expect(jsonData.user_email).to.eql('test@testbusiness.com');",
+									"    pm.expect(jsonData.vertical).to.eql('TECHNOLOGY');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Test Business LLC\",\n  \"company_name\": \"Test Business LLC\",\n  \"company_name_suffix\": \"LLC\",\n  \"dba_name\": \"Test Business\",\n  \"dba_radio\": true,\n  \"legal_form\": \"PRIVATE_PROFIT\",\n  \"registration_country\": \"US\",\n  \"ein_number\": \"11-9876543\",\n  \"ein_issuing_country\": \"US\",\n  \"user_email\": \"test@testbusiness.com\",\n  \"street_address\": \"123 Test Street\",\n  \"city\": \"Test City\",\n  \"state\": \"CA\",\n  \"zip_code\": \"12345\",\n  \"country\": \"US\",\n  \"support_email\": \"support@testbusiness.com\",\n  \"support_phone\": \"+15551234567\",\n  \"website_url\": \"https://testbusiness.com\",\n  \"vertical\": \"TECHNOLOGY\",\n  \"brand_relationship\": \"BASIC_ACCOUNT\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl_dev}}/api/brands",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["api", "brands"]
+						}
+					}
+				},
+				{
+					"name": "Update Brand Information",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Brand updated successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Updated data is correct', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.support_phone).to.eql('+15551234568');",
+									"    pm.expect(jsonData.website_url).to.eql('https://updated-testbusiness.com');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"support_phone\": \"+15551234568\",\n  \"website_url\": \"https://updated-testbusiness.com\",\n  \"support_email\": \"support@updated-testbusiness.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl_dev}}/api/brands/{{brandId}}",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["api", "brands", "{{brandId}}"]
+						}
+					}
+				},
+				{
+					"name": "Verify Brand Compliance Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Brand compliance check successful', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Compliance status fields present', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('tcr_brand_id');",
+									"    pm.expect(jsonData).to.have.property('tcr_brand_identity_status');",
+									"    pm.expect(jsonData).to.have.property('website_url_status');",
+									"    pm.expect(jsonData).to.have.property('verification');",
+									"});",
+									"",
+									"pm.test('URL validation status available', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('ssl_url_status');",
+									"    pm.expect(jsonData).to.have.property('tos_url_status');",
+									"    pm.expect(jsonData).to.have.property('privacy_policy_url_status');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl_dev}}/api/brands/{{brandId}}/compliance",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["api", "brands", "{{brandId}}", "compliance"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Campaign Management",
+			"item": [
+				{
+					"name": "Get All Campaigns for Brand",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Campaigns retrieved successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response is an array', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});",
+									"",
+									"pm.test('Campaign structure is correct', function () {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.length > 0) {",
+									"        var campaign = jsonData[0];",
+									"        pm.expect(campaign).to.have.property('id');",
+									"        pm.expect(campaign).to.have.property('name');",
+									"        pm.expect(campaign).to.have.property('status');",
+									"        pm.expect(campaign).to.have.property('use_case');",
+									"        pm.collectionVariables.set('campaignId', campaign.id);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl_dev}}/api/brands/{{brandId}}/campaigns",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["api", "brands", "{{brandId}}", "campaigns"]
+						}
+					}
+				},
+				{
+					"name": "Create New Campaign",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Campaign created successfully', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Response contains campaign ID', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.collectionVariables.set('campaignId', jsonData.id);",
+									"});",
+									"",
+									"pm.test('Campaign data is correct', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.name).to.eql('Test Marketing Campaign');",
+									"    pm.expect(jsonData.use_case).to.eql('MARKETING');",
+									"    pm.expect(jsonData.vertical).to.eql('TECHNOLOGY');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Test Marketing Campaign\",\n  \"description\": \"Promotional messages for new product launch\",\n  \"use_case\": \"MARKETING\",\n  \"vertical\": \"TECHNOLOGY\",\n  \"message_flow\": \"Test Business is launching a new product. Reply STOP to opt out.\",\n  \"help_message\": \"Reply HELP for assistance or STOP to opt out. Contact support@testbusiness.com for more info.\",\n  \"opt_in_keywords\": [\"JOIN\", \"START\", \"YES\"],\n  \"opt_out_keywords\": [\"STOP\", \"QUIT\", \"UNSUBSCRIBE\"],\n  \"expected_monthly_volume\": 10000,\n  \"brand_id\": \"{{brandId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl_dev}}/api/campaigns",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["api", "campaigns"]
+						}
+					}
+				},
+				{
+					"name": "Get Campaign Details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Campaign details retrieved successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Campaign details are complete', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('name');",
+									"    pm.expect(jsonData).to.have.property('description');",
+									"    pm.expect(jsonData).to.have.property('use_case');",
+									"    pm.expect(jsonData).to.have.property('status');",
+									"});",
+									"",
+									"pm.test('Message templates are present', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('message_flow');",
+									"    pm.expect(jsonData).to.have.property('help_message');",
+									"    pm.expect(jsonData).to.have.property('opt_in_keywords');",
+									"    pm.expect(jsonData).to.have.property('opt_out_keywords');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl_dev}}/api/campaigns/{{campaignId}}",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["api", "campaigns", "{{campaignId}}"]
+						}
+					}
+				},
+				{
+					"name": "Update Campaign",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Campaign updated successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Updated data is correct', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.expected_monthly_volume).to.eql(15000);",
+									"    pm.expect(jsonData.description).to.eql('Updated promotional messages for product launch');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"description\": \"Updated promotional messages for product launch\",\n  \"expected_monthly_volume\": 15000,\n  \"help_message\": \"Updated: Reply HELP for assistance or STOP to opt out. Contact support@testbusiness.com for more info.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl_dev}}/api/campaigns/{{campaignId}}",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["api", "campaigns", "{{campaignId}}"]
+						}
+					}
+				},
+				{
+					"name": "Submit Campaign for Review",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Campaign submitted for review successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Campaign status updated', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql('UNDER_REVIEW');",
+									"});",
+									"",
+									"pm.test('Submission timestamp present', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('submitted_at');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl_dev}}/api/campaigns/{{campaignId}}/submit",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["api", "campaigns", "{{campaignId}}", "submit"]
+						}
+					}
+				},
+				{
+					"name": "Get Campaign Messages",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Campaign messages retrieved successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Messages array is present', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('messages');",
+									"    pm.expect(jsonData.messages).to.be.an('array');",
+									"});",
+									"",
+									"pm.test('Message statistics available', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('total_messages');",
+									"    pm.expect(jsonData).to.have.property('message_types');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl_dev}}/api/campaigns/{{campaignId}}/messages",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["api", "campaigns", "{{campaignId}}", "messages"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Number Management",
+			"item": [
+				{
+					"name": "Get Available Numbers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Available numbers retrieved successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Numbers array is present', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('available_numbers');",
+									"    pm.expect(jsonData.available_numbers).to.be.an('array');",
+									"});",
+									"",
+									"pm.test('Number details are complete', function () {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.available_numbers.length > 0) {",
+									"        var number = jsonData.available_numbers[0];",
+									"        pm.expect(number).to.have.property('phone_number');",
+									"        pm.expect(number).to.have.property('capabilities');",
+									"        pm.expect(number).to.have.property('pricing');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl_dev}}/api/numbers/available?area_code=555&quantity=10",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["api", "numbers", "available"],
+							"query": [
+								{
+									"key": "area_code",
+									"value": "555"
+								},
+								{
+									"key": "quantity",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Provision Number for Campaign",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Number provisioned successfully', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Provisioned number details correct', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('phone_number');",
+									"    pm.expect(jsonData).to.have.property('campaign_id');",
+									"    pm.expect(jsonData.campaign_id).to.eql(pm.collectionVariables.get('campaignId'));",
+									"});",
+									"",
+									"pm.test('Number status is active', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql('ACTIVE');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phone_number\": \"+15551234567\",\n  \"campaign_id\": \"{{campaignId}}\",\n  \"capabilities\": [\"SMS\", \"MMS\"]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl_dev}}/api/numbers/provision",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["api", "numbers", "provision"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Compliance and Verification",
+			"item": [
+				{
+					"name": "Validate Website URLs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('URL validation completed successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Validation results are present', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('website_url_valid');",
+									"    pm.expect(jsonData).to.have.property('ssl_certificate_valid');",
+									"    pm.expect(jsonData).to.have.property('privacy_policy_found');",
+									"    pm.expect(jsonData).to.have.property('terms_of_service_found');",
+									"});",
+									"",
+									"pm.test('Validation details provided', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('validation_errors');",
+									"    pm.expect(jsonData).to.have.property('recommendations');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"brand_id\": \"{{brandId}}\",\n  \"website_url\": \"https://testbusiness.com\",\n  \"privacy_policy_url\": \"https://testbusiness.com/privacy\",\n  \"terms_of_service_url\": \"https://testbusiness.com/terms\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl_dev}}/api/validation/urls",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["api", "validation", "urls"]
+						}
+					}
+				},
+				{
+					"name": "Check Opt-in Form Compliance",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Opt-in form validation completed', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Compliance check results available', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('opt_in_form_compliant');",
+									"    pm.expect(jsonData).to.have.property('required_elements_present');",
+									"    pm.expect(jsonData).to.have.property('compliance_score');",
+									"});",
+									"",
+									"pm.test('Detailed compliance breakdown provided', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('missing_elements');",
+									"    pm.expect(jsonData).to.have.property('recommendations');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"brand_id\": \"{{brandId}}\",\n  \"opt_in_form_url\": \"https://testbusiness.com/signup\",\n  \"check_elements\": [\n    \"phone_number_field\",\n    \"consent_checkbox\",\n    \"privacy_policy_link\",\n    \"terms_of_service_link\",\n    \"opt_out_instructions\",\n    \"message_frequency_disclosure\",\n    \"carrier_charges_disclosure\"\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl_dev}}/api/validation/opt-in-form",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["api", "validation", "opt-in-form"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

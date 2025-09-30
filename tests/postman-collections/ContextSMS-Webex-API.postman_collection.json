@@ -1,0 +1,428 @@
+{
+	"info": {
+		"_postman_id": "webex-api-collection-001",
+		"name": "ContextSMS Webex Bot API",
+		"description": "Comprehensive API tests for ContextSMS Webex Bot API - Enterprise messaging capabilities with phone number mapping",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl_dev",
+			"value": "https://webex-dev-frontend.sabrhub.com/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "baseUrl_prod",
+			"value": "https://context-webex.sabrhub.com/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "authUrl",
+			"value": "https://usermgmt.sabrhub.com/v1",
+			"type": "string"
+		},
+		{
+			"key": "cspId",
+			"value": "CSP001",
+			"type": "string"
+		},
+		{
+			"key": "enterpriseId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "mappingId",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Login successful', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response contains access token', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('accessToken');",
+									"    pm.collectionVariables.set('accessToken', jsonData.accessToken);",
+									"});",
+									"",
+									"pm.test('Response contains user info', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('username');",
+									"    pm.expect(jsonData).to.have.property('refreshToken');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"test@email.com\",\n  \"password\": \"testpassword\"\n}"
+						},
+						"url": {
+							"raw": "{{authUrl}}/auth/login",
+							"host": ["{{authUrl}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Refresh Access Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Token refresh successful', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('New access token received', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('accessToken');",
+									"    pm.collectionVariables.set('accessToken', jsonData.accessToken);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"test@email.com\",\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+						},
+						"url": {
+							"raw": "{{authUrl}}/auth/getaccesstoken",
+							"host": ["{{authUrl}}"],
+							"path": ["auth", "getaccesstoken"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Enterprise Management",
+			"item": [
+				{
+					"name": "Create Enterprise",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Enterprise created successfully', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Response contains enterprise ID', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('enterpriseId');",
+									"    pm.collectionVariables.set('enterpriseId', jsonData.enterpriseId);",
+									"});",
+									"",
+									"pm.test('Enterprise data is correct', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.name).to.eql('Test Enterprise');",
+									"    pm.expect(jsonData.contact).to.eql('John Doe');",
+									"    pm.expect(jsonData.email).to.eql('john@testenterprise.com');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Test Enterprise\",\n  \"contact\": \"John Doe\",\n  \"number\": \"+12223334444\",\n  \"email\": \"john@testenterprise.com\",\n  \"defaultMmsSelection\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl_dev}}/enterprise/{{cspId}}",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["enterprise", "{{cspId}}"]
+						}
+					}
+				},
+				{
+					"name": "Get Enterprise by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Enterprise retrieved successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Enterprise details are correct', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('enterpriseId');",
+									"    pm.expect(jsonData).to.have.property('name');",
+									"    pm.expect(jsonData).to.have.property('contact');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl_dev}}/enterprise/getenterprise/{{enterpriseId}}",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["enterprise", "getenterprise", "{{enterpriseId}}"]
+						}
+					}
+				},
+				{
+					"name": "List Enterprises by CSP",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Enterprises list retrieved successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response is an array', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl_dev}}/csp/enterprises/{{cspId}}",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["csp", "enterprises", "{{cspId}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Enterprise",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Enterprise deleted successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl_dev}}/enterprise/deleteenterprise/{{enterpriseId}}",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["enterprise", "deleteenterprise", "{{enterpriseId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Mapping Management",
+			"item": [
+				{
+					"name": "Create Phone Number Mapping",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Mapping created successfully', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Response contains mapping ID', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('numberToMessageAppMapId');",
+									"    pm.collectionVariables.set('mappingId', jsonData.numberToMessageAppMapId);",
+									"});",
+									"",
+									"pm.test('Mapping data is correct', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.phoneNumber).to.eql('+15551234567');",
+									"    pm.expect(jsonData.messagingAppType).to.eql('Webex');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"messagingAppId\": \"webex-bot-test-123\",\n  \"phoneNumber\": \"+15551234567\",\n  \"messagingAppType\": \"Webex\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl_dev}}/mapping/add/{{enterpriseId}}",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["mapping", "add", "{{enterpriseId}}"]
+						}
+					}
+				},
+				{
+					"name": "Get Mappings by Enterprise",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Mappings retrieved successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response is an array', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl_dev}}/mappings/enterprise/{{enterpriseId}}",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["mappings", "enterprise", "{{enterpriseId}}"]
+						}
+					}
+				},
+				{
+					"name": "Read Mapping by App ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Mapping read successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Mapping details are correct', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('numberToMessageAppMapId');",
+									"    pm.expect(jsonData).to.have.property('messagingAppId');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"messagingAppId\": \"webex-bot-test-123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl_dev}}/mapping/messagingAppId",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["mapping", "messagingAppId"]
+						}
+					}
+				},
+				{
+					"name": "Delete Mapping",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Mapping deleted successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl_dev}}/mapping/{{mappingId}}",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["mapping", "{{mappingId}}"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,629 @@
+{
+	"info": {
+		"_postman_id": "teams-api-collection-002",
+		"name": "ContextSMS Teams Platform API",
+		"description": "Comprehensive API tests for ContextSMS Teams Platform API - Unified Teams integration with CSP white-label configuration",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl_dev",
+			"value": "https://teams-dev-frontend.sabrhub.com/api/v2",
+			"type": "string"
+		},
+		{
+			"key": "baseUrl_prod",
+			"value": "https://context-sms.sabrhub.com/api/v2",
+			"type": "string"
+		},
+		{
+			"key": "cspId",
+			"value": "CSP001",
+			"type": "string"
+		},
+		{
+			"key": "enterpriseId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "mappingId",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Login successful', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response contains access token', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('accessToken');",
+									"    pm.collectionVariables.set('accessToken', jsonData.accessToken);",
+									"});",
+									"",
+									"pm.test('Teams service is available', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.services).to.include('Teams');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"test@email.com\",\n  \"password\": \"securePassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl_dev}}/auth/login",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Refresh Access Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Token refresh successful', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('New access token received', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('accessToken');",
+									"    pm.collectionVariables.set('accessToken', jsonData.accessToken);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"test@email.com\",\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl_dev}}/auth/getaccesstoken",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["auth", "getaccesstoken"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "CSP Management",
+			"item": [
+				{
+					"name": "Create CSP Configuration",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('CSP created successfully', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('CSP data is correct', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('cspId');",
+									"    pm.expect(jsonData.cspName).to.eql('Test CSP Communications');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cspName\": \"Test CSP Communications\",\n  \"cspId\": \"TESTCSP001\",\n  \"contactEmail\": \"admin@testcsp.com\",\n  \"supportPhone\": \"+15551234567\",\n  \"billingEnabled\": true,\n  \"whitelabelSettings\": {\n    \"brandName\": \"Test CSP Messaging\",\n    \"logoUrl\": \"https://testcsp.com/logo.png\",\n    \"primaryColor\": \"#0066CC\",\n    \"supportUrl\": \"https://support.testcsp.com\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl_dev}}/csp",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["csp"]
+						}
+					}
+				},
+				{
+					"name": "Get CSP Information",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('CSP information retrieved successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('CSP details are correct', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('cspName');",
+									"    pm.expect(jsonData).to.have.property('cspId');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl_dev}}/csp",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["csp"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Enterprise Management",
+			"item": [
+				{
+					"name": "Create Enterprise",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Enterprise created successfully', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Response contains enterprise ID', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('enterpriseId');",
+									"    pm.collectionVariables.set('enterpriseId', jsonData.enterpriseId);",
+									"});",
+									"",
+									"pm.test('Teams settings are configured', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('teamsSettings');",
+									"    pm.expect(jsonData.teamsSettings.configured).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Test Dental Clinic\",\n  \"contactName\": \"Dr. Test Smith\",\n  \"contactEmail\": \"test@testdental.com\",\n  \"contactPhone\": \"+15559876543\",\n  \"address\": {\n    \"street\": \"123 Test Street\",\n    \"city\": \"Test City\",\n    \"state\": \"CA\",\n    \"zipCode\": \"12345\",\n    \"country\": \"US\"\n  },\n  \"teamsSettings\": {\n    \"teamId\": \"test-team-id-12345\",\n    \"channelId\": \"test-channel-id\",\n    \"webhookUrl\": \"https://hooks.teams.microsoft.com/test-webhook\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl_dev}}/enterprise",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["enterprise"]
+						}
+					}
+				},
+				{
+					"name": "Get Enterprise Details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Enterprise retrieved successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Enterprise details are complete', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('enterpriseId');",
+									"    pm.expect(jsonData).to.have.property('name');",
+									"    pm.expect(jsonData).to.have.property('teamsSettings');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl_dev}}/enterprise/{{enterpriseId}}",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["enterprise", "{{enterpriseId}}"]
+						}
+					}
+				},
+				{
+					"name": "List All Enterprises",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Enterprises list retrieved successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response is an array', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl_dev}}/enterprises",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["enterprises"]
+						}
+					}
+				},
+				{
+					"name": "Update Enterprise Settings",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Enterprise updated successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Updated data is correct', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.name).to.eql('Test Dental Clinic - Updated');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Test Dental Clinic - Updated\",\n  \"contactPhone\": \"+15559876544\",\n  \"teamsSettings\": {\n    \"teamId\": \"updated-team-id-67890\",\n    \"channelId\": \"updated-channel-id\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl_dev}}/enterprise/{{enterpriseId}}",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["enterprise", "{{enterpriseId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Mapping Management",
+			"item": [
+				{
+					"name": "Create Phone Number Mapping",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Mapping created successfully', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Response contains mapping ID', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('mappingId');",
+									"    pm.collectionVariables.set('mappingId', jsonData.mappingId);",
+									"});",
+									"",
+									"pm.test('Mapping data is correct', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.phoneNumber).to.eql('+15559876543');",
+									"    pm.expect(jsonData.messagingAppType).to.eql('Teams');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phoneNumber\": \"+15559876543\",\n  \"enterpriseId\": \"{{enterpriseId}}\",\n  \"messagingAppId\": \"test-team-id-12345\",\n  \"messagingAppType\": \"Teams\",\n  \"routingRules\": {\n    \"businessHours\": {\n      \"start\": \"09:00\",\n      \"end\": \"17:00\",\n      \"timezone\": \"America/Los_Angeles\",\n      \"days\": [\"Monday\", \"Tuesday\", \"Wednesday\", \"Thursday\", \"Friday\"]\n    },\n    \"afterHoursMessage\": \"Thank you for contacting us. We will respond during business hours.\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl_dev}}/mapping",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["mapping"]
+						}
+					}
+				},
+				{
+					"name": "Get All Mappings",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Mappings retrieved successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response is an array', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl_dev}}/mappings",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["mappings"]
+						}
+					}
+				},
+				{
+					"name": "Update Mapping Rules",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Mapping updated successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"routingRules\": {\n    \"businessHours\": {\n      \"start\": \"08:00\",\n      \"end\": \"18:00\",\n      \"timezone\": \"America/Los_Angeles\"\n    },\n    \"autoReply\": \"Thanks for your message! We will respond shortly.\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl_dev}}/mapping/{{mappingId}}",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["mapping", "{{mappingId}}"]
+						}
+					}
+				},
+				{
+					"name": "Test Message Flow",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Test message sent successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Message flow confirmed', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('messageId');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phoneNumber\": \"+15559876543\",\n  \"message\": \"This is a test message from the Teams API\",\n  \"sender\": \"TestSystem\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl_dev}}/messages/test",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["messages", "test"]
+						}
+					}
+				},
+				{
+					"name": "Delete Mapping",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Mapping deleted successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl_dev}}/mapping/{{mappingId}}",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["mapping", "{{mappingId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Advanced Features",
+			"item": [
+				{
+					"name": "Create Webhook Configuration",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Webhook created successfully', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Webhook configuration is correct', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('webhookId');",
+									"    pm.expect(jsonData.url).to.eql('https://test-server.com/webhooks/teams');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"url\": \"https://test-server.com/webhooks/teams\",\n  \"events\": [\"message.received\", \"message.sent\", \"mapping.created\"],\n  \"secret\": \"test-webhook-secret-key\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl_dev}}/webhooks",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["webhooks"]
+						}
+					}
+				},
+				{
+					"name": "Create Message Template",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Template created successfully', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Template data is correct', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.name).to.eql('test_confirmation');",
+									"    pm.expect(jsonData.variables).to.include('customerName');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"test_confirmation\",\n  \"content\": \"Hi {customerName}, your test is confirmed for {testDate} at {testTime}. Reply CONFIRM to verify.\",\n  \"variables\": [\"customerName\", \"testDate\", \"testTime\"]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl_dev}}/templates",
+							"host": ["{{baseUrl_dev}}"],
+							"path": ["templates"]
+						}
+					}
+				}
+			]
+		}
+	]
+}
