@@ -1,0 +1,20 @@
+# Redocly CLI-compatible configuration (Sabrhub)
+# Note: Full branding, domain, and SEO settings are in redocly-enterprise.yaml for deployment
+
+# APIs
+apis:
+  webex:
+    root: specs/contextsms-webex.yaml
+  teams:
+    root: specs/contextsms-teams.yaml
+  contextregister:
+    root: specs/contextregister.yaml
+
+# Linting rules
+rules:
+  no-unused-components: error
+  operation-operationId: error
+  operation-summary: warn
+  operation-description: warn
+  tag-description: warn
+
