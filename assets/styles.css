@@ -1,0 +1,75 @@
+/* assets/styles.css — Sabrhub branding (simple, Enterprise-compatible)
+   Note: Values chosen based on current Sabrhub palette used in config.
+*/
+:root{
+  /* COLORS */
+  --brand-primary: #4C86E4;
+  --brand-primary-contrast: #FFFFFF;
+  --brand-accent: #00D4AA;
+  --brand-muted: #6B7280;
+  --bg-default: #FFFFFF;
+  --text-default: #1B2B41;
+  --text-muted: #6B7280;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --brand-gradient-start: #4C86E4;
+  --brand-gradient-end:   #00D4AA;
+  /* SPACING */
+  --space-xxs: 4px; --space-xs: 6px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 40px;
+  /* RADII */
+  --radius-sm: 4px; --radius-md: 8px; --radius-lg: 14px;
+  /* SHADOWS */
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-md: 0 6px 18px rgba(0,0,0,0.08);
+  --shadow-lg: 0 14px 28px rgba(0,0,0,0.12);
+  /* FONTS */
+  --font-sans: 'Inter', 'Roboto', 'Helvetica Neue', Arial, system-ui, -apple-system, 'Segoe UI';
+  --font-heading: 'Inter', 'Roboto', 'Helvetica Neue', Arial, system-ui, -apple-system, 'Segoe UI';
+}
+html{ font-family: var(--font-sans); color:var(--text-default); background:var(--bg-default); }
+body{ margin:0; }
+h1,h2,h3,h4,h5,h6{ color:var(--text-default); margin:0 0 var(--space-md) 0; font-family:var(--font-heading); font-weight:600; }
+
+/* Header / top bar helper (for custom templates) */
+.site-header{ display:flex; align-items:center; gap:12px; padding:var(--space-md);
+  background:linear-gradient(90deg,var(--brand-gradient-start),var(--brand-gradient-end)); color:#fff; }
+.site-header img.logo{ max-height:48px; height:auto; width:auto; }
+
+/* Buttons */
+.btn{ display:inline-block; padding:0.6rem 1rem; border-radius:var(--radius-md); cursor:pointer; text-decoration:none; border:0; font-weight:600; }
+.btn--primary{ background:var(--brand-primary); color:var(--brand-primary-contrast); box-shadow:var(--shadow-md); }
+.btn--primary:hover{ filter:brightness(0.95); }
+.btn--primary:active{ transform:translateY(1px); }
+.btn--primary:focus{ outline:3px solid rgba(76,134,228,0.35); outline-offset:2px; }
+.btn--secondary{ background:transparent; color:var(--brand-primary); border:1px solid var(--brand-muted); }
+.btn--ghost{ background:transparent; color:var(--text-default); }
+.btn[disabled], .btn.is-disabled{ opacity:.6; cursor:not-allowed; }
+
+/* Forms */
+input[type="text"], input[type="email"], select, textarea{
+  padding:10px 12px; border:1px solid #E5E7EB; border-radius:var(--radius-sm); outline:none; width:100%;
+}
+input:focus, select:focus, textarea:focus{ border-color:var(--brand-primary); box-shadow:0 0 0 3px rgba(76,134,228,0.25); }
+.form-error{ color:var(--danger); }
+.form-success{ color:var(--success); }
+
+/* Cards */
+.card{ padding:var(--space-md); border-radius:var(--radius-md); background:#fff; box-shadow:var(--shadow-sm); }
+.card--interactive{ transition:box-shadow .2s ease, transform .2s ease; }
+.card--interactive:hover{ box-shadow:var(--shadow-lg); transform:translateY(-2px); }
+
+/* Utilities */
+.text-primary{ color:var(--brand-primary); }
+.text-muted{ color:var(--text-muted); }
+.mt-4{ margin-top:var(--space-lg); }
+.p-3{ padding:var(--space-md); }
+
+/* Redoc/Reunite specific tweaks */
+.redoc-wrap .menu-content{ background:#1B2B41; }
+.redoc-wrap .menu-content, .redoc-wrap .menu-content a{ color:#fff; }
+.redoc-wrap .http-verb{ background:var(--brand-primary); color:#fff; }
+.redoc-wrap .sc-bdfCDU{ font-family: var(--font-sans); }
+.redoc-wrap .menu-item-name{ color:#fff; }
+.redoc-wrap .menu-item.active>.menu-item-name{ color:var(--brand-accent); }
+
