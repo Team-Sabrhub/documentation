@@ -1,7 +1,14 @@
-# Sabrhub API Documentation - Redocly Enterprise Configuration
-# Domain: context-docs.sabrhub.com | SEO: Disabled | Full Sabrhub Branding
+url: https://context-docs.sabrhub.com
+seo:
+  noindex: true   
+  nofollow: true 
+meta:
+  - name: 'robots'
+    content: 'noindex, nofollow, noarchive, nosnippet'
+  - name: 'googlebot'
+    content: 'noindex, nofollow'
 
-# API Specifications
+# APIs
 apis:
   webex:
     root: specs/contextsms-webex.yaml
@@ -10,7 +17,7 @@ apis:
   contextregister:
     root: specs/contextregister.yaml
 
-# Linting Rules
+# Linting rules
 rules:
   no-unused-components: error
   operation-operationId: error
@@ -18,58 +25,24 @@ rules:
   operation-description: warn
   tag-description: warn
 
-# Redocly Enterprise Configuration
-redocly:
-  # Domain Configuration (Enterprise)
-  domain: context-docs.sabrhub.com
-  
-  # SEO Settings - Block Google Indexing
-  seo:
-    title: 'Sabrhub API Documentation Portal'
-    description: 'Internal API documentation for Sabrhub ContextSMS platform - Webex, Teams, and 10DLC messaging'
-    noindex: true
-    nofollow: true
-    robotsContent: 'noindex, nofollow, noarchive, nosnippet'
-    
-  # Site Metadata
-  site:
-    title: 'Sabrhub API Documentation Portal'
-    description: 'Comprehensive API documentation for Sabrhub ContextSMS platform'
-    author: 'Sabrhub Inc.'
-    company: 'Sabrhub Inc.'
-    
-  # Footer Configuration
-  footer:
-    copyrightText: '© 2024 Sabrhub Inc. All rights reserved.'
-    links:
-      - label: 'Privacy Policy'
-        href: 'https://sabrhub.com/privacy'
-      - label: 'Terms of Service'
-        href: 'https://sabrhub.com/terms'
-      - label: 'Support'
-        href: 'https://support.sabrhub.com'
-      - label: 'Contact'
-        href: 'https://sabrhub.com/contact'
-
-# Complete Sabrhub Theme Configuration
+# Full Sabrhub branding theme
 theme:
   openapi:
-    # Branding Assets
+    # Logo and branding assets
     logo: assets/sabrhub-logo.png
     favicon: assets/logos/sabrhub-favicon.png
     
-    # Custom Sabrhub Stylesheet
-    additionalCss:
+    # Custom CSS stylesheet
+    styles:
       - assets/styles.css
     
-    # Sabrhub Brand Theme
+    # Theme colors and layout
     theme:
-      # Brand Colors
       colors:
         primary:
           main: '#4C86E4'        # Sabrhub Primary Blue
-          light: '#6FA0F2'       # Light Blue for hover
-          dark: '#3B6DB8'        # Dark Blue for active
+          light: '#6FA0F2'       # Lighter Blue
+          dark: '#3B6DB8'        # Darker Blue
         secondary:
           main: '#1B2B41'        # Sabrhub Navy
         accent:
@@ -81,23 +54,17 @@ theme:
           default: '#FFFFFF'     # Main background
           paper: '#F9FAFB'       # Card background
         success:
-          main: '#10B981'        # Success green
+          main: '#10B981'
         warning:
-          main: '#F59E0B'        # Warning amber
+          main: '#F59E0B'
         error:
-          main: '#EF4444'        # Error red
+          main: '#EF4444'
       
-      # Navigation Sidebar
       sidebar:
         backgroundColor: '#1B2B41'   # Sabrhub Navy
-        textColor: '#FFFFFF'         # White text
-        activeTextColor: '#00D4AA'   # Sabrhub Teal for active items
-        groupItems:
-          textTransform: 'uppercase'
-        level1Items:
-          textTransform: 'none'
+        textColor: '#FFFFFF'
+        activeTextColor: '#00D4AA'   # Sabrhub accent
       
-      # Typography - Inter Font System
       typography:
         fontFamily: "'Inter', 'Roboto', 'Helvetica Neue', Arial, sans-serif"
         fontSize: '16px'
@@ -110,13 +77,23 @@ theme:
           fontFamily: "'Fira Code', 'Monaco', 'Consolas', monospace"
           fontSize: '14px'
           backgroundColor: '#F3F4F6'
-      
-      # Right Panel (Try It)
-      rightPanel:
-        backgroundColor: '#F9FAFB'
-        textColor: '#374151'
-      
-      # Code Blocks
-      codeBlock:
-        backgroundColor: '#1F2937'
+
+# Site metadata
+site:
+  title: 'Sabrhub API Documentation Portal'
+  description: 'Comprehensive API documentation for Sabrhub ContextSMS platform - Webex, Teams, and 10DLC messaging solutions'
+  
+  # Footer branding
+  footer:
+    copyrightText: '© 2024 Sabrhub Inc. All rights reserved.'
+    links:
+      - label: 'Privacy Policy'
+        href: 'https://sabrhub.com/privacy'
+      - label: 'Terms of Service'
+        href: 'https://sabrhub.com/terms'
+      - label: 'Support'
+        href: 'https://support.sabrhub.com'
+      - label: 'Contact'
+        href: 'https://sabrhub.com/contact'
+
 
