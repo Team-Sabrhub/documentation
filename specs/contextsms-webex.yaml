@@ -3,7 +3,6 @@ info:
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
-  title: ContextSMS Webex Bot API
   version: 1.0.0
   contact:
     name: Sabrhub API Support Team
@@ -35,7 +34,9 @@ info:
     - **Production**: `https://webex-backend.sabrhub.com/v1`
     - **Development**: `https://webex-backend-dev.sabrhub.com/v1` 
     - **Authentication**: `https://usermgmt.sabrhub.com/v1`
-    **Note:** Parameters marked with * are required. For detailed instructions, see our [Integration Guide](../content/webex-bot/index.html).
+    
+    **Note:** Parameters marked with * are required. For detailed instructions, see our [Integration Guide](https://sabrhub.com/docs/webex-integration).
+
 servers:
   - url: https://context-webex.sabrhub.com/api/v1
     description: Production Environment (live) - ContextSMS Webex
@@ -45,6 +46,7 @@ servers:
     description: User Management (Auth) - Dev auth (used by sample requests)
   - url: https://api.redocly.com/mock/contextsms-webex/v1
     description: Mock Server (Redocly) — public demo / Try-It
+
 components:
   securitySchemes:
     BearerAuth:
@@ -64,6 +66,79 @@ components:
         - Never expose tokens in client-side code
         - Store tokens securely in environment variables
         - Tokens expire - implement refresh logic
+
+  schemas:
+    EnterpriseResponse:
+      type: object
+      properties:
+        enterpriseId:
+          type: string
+          example: "E0000090"
+        name:
+          type: string
+          example: "test enterprise2"
+        contact:
+          type: string
+          example: "Test Contact"
+        number:
+          type: string
+          example: "+12223334444"
+        email:
+          type: string
+          example: "test@email.com"
+        deleted:
+          type: boolean
+          example: false
+        createdDate:
+          type: integer
+          example: 1698446777442
+        updateDate:
+          type: integer
+          example: 1698446777443
+        webexSettings:
+          type: object
+          nullable: true
+        numberToMessageAppMaps:
+          type: array
+          nullable: true
+        defaultMmsSelection:
+          type: boolean
+          example: true
+
+    AuthResponse:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "test@email.com"
+        accessToken:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        refreshToken:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        expirationTimeInUTC:
+          type: string
+          format: date-time
+          example: "2024-02-29T15:09:14.242875589"
+        roles:
+          type: array
+          items:
+            type: string
+        tenantId:
+          type: string
+          example: "tenant123"
+        services:
+          type: array
+          items:
+            type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Invalid credentials"
 
 security:
   - BearerAuth: []
@@ -121,46 +196,23 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  username:
-                    type: string
-                  accessToken:
-                    type: string
-                  refreshToken:
-                    type: string
-                  expirationTimeInUTC:
-                    type: string
-                    format: date-time
-                  roles:
-                    type: array
-                    items:
-                      type: string
-                  tenantId:
-                    type: string
-                  services:
-                    type: array
-                    items:
-                      type: string
+                $ref: '#/components/schemas/AuthResponse'
         '400':
           description: Invalid credentials or bad request
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
+                $ref: '#/components/schemas/ErrorResponse'
       x-codeSamples:
         - lang: cURL
           label: cURL
           source: |
-            curl -X POST "https://usermgmt.sabrhub.com/v1/auth/getaccesstoken" \
+            curl -X POST "https://usermgmt.sabrhub.com/v1/auth/login" \
               -H "Content-Type: application/json" \
               -H "Accept: application/json" \
               -d '{
                 "username": "test@email.com",
-                "refreshToken": "<REFRESH_TOKEN>"
+                "password": "Ni*nsl$k3n("
               }'
 
         - lang: Python
@@ -169,23 +221,22 @@ paths:
             import requests
 
             url = "https://usermgmt.sabrhub.com/v1/auth/login"
-            response = requests.post(url, json={"username": "test", "password": "12345"})
+            response = requests.post(url, json={"username": "test@email.com", "password": "Ni*nsl$k3n("})
             print(response.json())
+            
         - lang: JavaScript
           label: JavaScript
           source: |
             const axios = require('axios');
 
             const url = "https://usermgmt.sabrhub.com/v1/auth/login";
-            axios.post(url, { username: "test", password: "12345" })
+            axios.post(url, { username: "test@email.com", password: "Ni*nsl$k3n(" })
               .then(response => {
                 console.log(response.data);
               })
               .catch(error => {
                 console.error(error);
               });
-
-
 
   /auth/getaccesstoken:
     servers:
@@ -229,36 +280,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  username:
-                    type: string
-                  accessToken:
-                    type: string
-                  refreshToken:
-                    type: string
-                  expirationTimeInUTC:
-                    type: string
-                    format: date-time
-                  roles:
-                    type: array
-                    items:
-                      type: string
-                  tenantId:
-                    type: string
-                  services:
-                    type: array
-                    items:
-                      type: string
+                $ref: '#/components/schemas/AuthResponse'
         '400':
           description: Invalid request or refresh token
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
+                $ref: '#/components/schemas/ErrorResponse'
       x-codeSamples:
         - lang: cURL
           label: cURL
@@ -305,6 +333,8 @@ paths:
           required: true
           schema:
             type: string
+          description: CSP identifier (e.g. CSP001)
+          example: "CSP001"
       requestBody:
         required: true
         content:
@@ -320,68 +350,39 @@ paths:
                 name:
                   type: string
                   description: Name of the enterprise
+                  example: "test enterprise2"
                 contact:
                   type: string
                   description: Enterprise contact name
+                  example: "Test Contact"
                 number:
                   type: string
                   description: Enterprise contact number
+                  example: "+12223334444"
                 email:
                   type: string
                   description: Enterprise business admin email
+                  example: "test@email.com"
                 defaultMmsSelection:
                   type: boolean
                   description: >
                     Default selection of the mmsEnabled flag when creating NumberMapping.
                     If MMS feature is Strict or Disabled, follow the feature settings.
                     If Partial, can be true or false.
-            examples:
-              curl:
-                summary: cURL example
-                value:
-                    name: "test enterprise2"
-                    contact: "Test Contact"
-                    number: "+12223334444"
-                    email: "test@email.com"
-                    defaultMmsSelection: true
-              python:
-                summary: Python example
-                value:
-                    name: "test enterprise2"
-                    contact: "Test Contact"
-                    number: "+12223334444"
-                    email: "test@email.com"
-                    defaultMmsSelection: true
-              javascript:
-                summary: JavaScript (fetch) example
-                value:
-                    name: "test enterprise2"
-                    contact: "Test Contact"
-                    number: "+12223334444"
-                    email: "test@email.com"
-                    defaultMmsSelection: true
+                  example: true
       responses:
         '201':
           description: Enterprise created successfully.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  enterpriseId: "E0000090"
-                name: "test enterprise2"
-                contact: "Test Contact"
-                number: "+12223334444"
-                email: "test@email.com"
-                deleted: false
-                createdDate: 1698446777442
-                updateDate: 1698446777443
-                webexSettings: null
-                numberToMessageAppMaps: null
-                defaultMmsSelection: true
+                $ref: '#/components/schemas/EnterpriseResponse'
         '400':
           description: Bad Request
-
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /enterprise/getenterprise/{enterpriseId}:
     get:
@@ -396,27 +397,41 @@ paths:
           required: true
           schema:
             type: string
+          description: Enterprise identifier
+          example: "E0000090"
       responses:
         '200':
           description: Enterprise found successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnterpriseResponse'
         '404':
           description: Enterprise not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       x-codeSamples:
         - lang: cURL
           source: |
-            curl -X GET "https://usermgmt.sabrhub.com/v1/enterprise/getenterprise/{enterpriseId}"
+            curl -X GET "https://webex-dev-frontend.sabrhub.com/api/v1/enterprise/getenterprise/{enterpriseId}" \
+              -H "Authorization: Bearer YOUR_TOKEN"
         - lang: Python
           source: |
             import requests
 
-            url = "https://usermgmt.sabrhub.com/v1/enterprise/getenterprise/{enterpriseId}"
-            response = requests.get(url)
+            url = "https://webex-dev-frontend.sabrhub.com/api/v1/enterprise/getenterprise/{enterpriseId}"
+            headers = {"Authorization": "Bearer YOUR_TOKEN"}
+            response = requests.get(url, headers=headers)
             print(response.json())
         - lang: JavaScript
           source: |
-            const url = "https://usermgmt.sabrhub.com/v1/enterprise/getenterprise/{enterpriseId}";
+            const url = "https://webex-dev-frontend.sabrhub.com/api/v1/enterprise/getenterprise/{enterpriseId}";
 
-            fetch(url)
+            fetch(url, {
+              headers: { "Authorization": "Bearer YOUR_TOKEN" }
+            })
               .then(res => res.json())
               .then(data => console.log(data))
               .catch(err => console.error("Error:", err));
@@ -434,29 +449,49 @@ paths:
           required: true
           schema:
             type: string
+          description: CSP identifier (e.g. CSP001)
+          example: "CSP001"
       responses:
         '200':
           description: Enterprises retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EnterpriseResponse'
         '400':
           description: Bad request. Invalid query or parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized. Missing or invalid authentication.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       x-codeSamples:
         - lang: cURL
           source: |
-            curl -X GET "https://usermgmt.sabrhub.com/v1/csp/enterprises/{cspId}"
+            curl -X GET "https://context-webex.sabrhub.com/api/v1/csp/enterprises/{cspId}" \
+              -H "Authorization: Bearer YOUR_TOKEN"
         - lang: Python
           source: |
             import requests
 
-            url = "https://usermgmt.sabrhub.com/v1/csp/enterprises/{cspId}"
-            response = requests.get(url)
+            url = "https://context-webex.sabrhub.com/api/v1/csp/enterprises/{cspId}"
+            headers = {"Authorization": "Bearer YOUR_TOKEN"}
+            response = requests.get(url, headers=headers)
             print(response.json())
         - lang: JavaScript
           source: |
-            const url = "https://usermgmt.sabrhub.com/v1/csp/enterprises/{cspId}";
+            const url = "https://context-webex.sabrhub.com/api/v1/csp/enterprises/{cspId}";
 
-            fetch(url)
+            fetch(url, {
+              headers: { "Authorization": "Bearer YOUR_TOKEN" }
+            })
               .then(res => res.json())
               .then(data => console.log(data))
               .catch(err => console.error("Error:", err));
@@ -474,29 +509,52 @@ paths:
           required: true
           schema:
             type: string
+          description: Enterprise identifier
+          example: "E0000090"
       responses:
         '200':
           description: Enterprise deleted successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Enterprise deleted successfully"
         '400':
           description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Enterprise not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       x-codeSamples:
         - lang: cURL
           source: |
-            curl -X DELETE "https://usermgmt.sabrhub.com/v1/enterprise/deleteenterprise/{enterpriseId}"
+            curl -X DELETE "https://webex-dev-frontend.sabrhub.com/api/v1/enterprise/deleteenterprise/{enterpriseId}" \
+              -H "Authorization: Bearer YOUR_TOKEN"
         - lang: Python
           source: |
             import requests
 
-            url = "https://usermgmt.sabrhub.com/v1/enterprise/deleteenterprise/{enterpriseId}"
-            response = requests.delete(url)
+            url = "https://webex-dev-frontend.sabrhub.com/api/v1/enterprise/deleteenterprise/{enterpriseId}"
+            headers = {"Authorization": "Bearer YOUR_TOKEN"}
+            response = requests.delete(url, headers=headers)
             print(response.json())
         - lang: JavaScript
           source: |
-            const url = "https://usermgmt.sabrhub.com/v1/enterprise/deleteenterprise/{enterpriseId}";
+            const url = "https://webex-dev-frontend.sabrhub.com/api/v1/enterprise/deleteenterprise/{enterpriseId}";
 
-            fetch(url, { method: "DELETE" })
+            fetch(url, { 
+              method: "DELETE",
+              headers: { "Authorization": "Bearer YOUR_TOKEN" }
+            })
               .then(res => res.json())
               .then(data => console.log(data))
               .catch(err => console.error("Error:", err));
@@ -514,39 +572,63 @@ paths:
           required: true
           schema:
             type: string
+          description: Enterprise identifier
+          example: "E0000090"
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-            examples:
-              curl:
-                summary: cURL
-                value:
-                    name: "test mapping"
-                    number: "+12223334444"
-                    type: "sms"
-
-              python:
-                summary: Python
-                value:
-                    name: "test mapping"
-                    number: "+12223334444"
-                    type: "sms"
-              javascript:
-                summary: JavaScript (fetch)
-                value:
-                    name: "test mapping"
-                    number: "+12223334444"
-                    type: "sms"
+              required:
+                - name
+                - number
+                - type
+              properties:
+                name:
+                  type: string
+                  description: Name of the mapping
+                  example: "test mapping"
+                number:
+                  type: string
+                  description: Phone number to map
+                  example: "+12223334444"
+                type:
+                  type: string
+                  description: Type of mapping
+                  example: "sms"
       responses:
         '200':
           description: Mapping added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mappingId:
+                    type: string
+                    example: "M0000001"
+                  name:
+                    type: string
+                    example: "test mapping"
+                  number:
+                    type: string
+                    example: "+12223334444"
+                  type:
+                    type: string
+                    example: "sms"
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: Mapping not found
+          description: Enterprise not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /mappings/csp/{cspId}:
     get:
@@ -562,68 +644,126 @@ paths:
           schema:
             type: string
           description: CSP identifier (e.g. CSP0000003)
+          example: "CSP0000003"
       responses:
         '200':
           description: Mappings retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    mappingId:
+                      type: string
+                    name:
+                      type: string
+                    number:
+                      type: string
+                    type:
+                      type: string
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Mappings not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       x-codeSamples:
         - lang: cURL
           source: |
-            curl -X GET "https://usermgmt.sabrhub.com/v1/mappings/csp/{cspId}"
+            curl -X GET "https://context-webex.sabrhub.com/api/v1/mappings/csp/{cspId}" \
+              -H "Authorization: Bearer YOUR_TOKEN"
         - lang: Python
           source: |
             import requests
 
-            url = "https://usermgmt.sabrhub.com/v1/mappings/csp/{cspId}"
-            response = requests.get(url)
+            url = "https://context-webex.sabrhub.com/api/v1/mappings/csp/{cspId}"
+            headers = {"Authorization": "Bearer YOUR_TOKEN"}
+            response = requests.get(url, headers=headers)
             print(response.json())
         - lang: JavaScript
           source: |
-            const url = "https://usermgmt.sabrhub.com/v1/mappings/csp/{cspId}";
+            const url = "https://context-webex.sabrhub.com/api/v1/mappings/csp/{cspId}";
 
-            fetch(url)
+            fetch(url, {
+              headers: { "Authorization": "Bearer YOUR_TOKEN" }
+            })
               .then(res => res.json())
               .then(data => console.log(data))
               .catch(err => console.error("Error:", err));
+
   /mappings/enterprise/{enterpriseId}:
     get:
       operationId: getMappingsByEnterprise
       tags:
         - Mapping Management
-      summary: Retrieve mappings for a specific CSP with optional filters
-      description: Return all mapping records associated with the given CSP (cspId).
+      summary: Retrieve mappings for a specific enterprise with optional filters
+      description: Return all mapping records associated with the given enterprise (enterpriseId).
       parameters:
         - in: path
           name: enterpriseId
           required: true
           schema:
             type: string
+          description: Enterprise identifier
+          example: "E0000090"
       responses:
         '200':
           description: Mappings retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    mappingId:
+                      type: string
+                    name:
+                      type: string
+                    number:
+                      type: string
+                    type:
+                      type: string
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Mappings not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       x-codeSamples:
         - lang: cURL
           source: |
-            curl -X GET "https://usermgmt.sabrhub.com/v1/mappings/enterprise/{enterpriseId}"
+            curl -X GET "https://context-webex.sabrhub.com/api/v1/mappings/enterprise/{enterpriseId}" \
+              -H "Authorization: Bearer YOUR_TOKEN"
         - lang: Python
           source: |
             import requests
 
-            url = "https://usermgmt.sabrhub.com/v1/mappings/enterprise/{enterpriseId}"
-            response = requests.get(url)
+            url = "https://context-webex.sabrhub.com/api/v1/mappings/enterprise/{enterpriseId}"
+            headers = {"Authorization": "Bearer YOUR_TOKEN"}
+            response = requests.get(url, headers=headers)
             print(response.json())
         - lang: JavaScript
           source: |
-            const url = "https://usermgmt.sabrhub.com/v1/mappings/enterprise/{enterpriseId}";
+            const url = "https://context-webex.sabrhub.com/api/v1/mappings/enterprise/{enterpriseId}";
 
-            fetch(url)
+            fetch(url, {
+              headers: { "Authorization": "Bearer YOUR_TOKEN" }
+            })
               .then(res => res.json())
               .then(data => console.log(data))
               .catch(err => console.error("Error:", err));
@@ -641,38 +781,61 @@ paths:
           required: true
           schema:
             type: string
+          description: Mapping identifier
+          example: "M0000001"
       responses:
         '200':
           description: Mapping deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Mapping deleted successfully"
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Mapping not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       x-codeSamples:
         - lang: cURL
           source: |
-            curl -X DELETE "https://usermgmt.sabrhub.com/v1/mapping/{mappingId}"
+            curl -X DELETE "https://context-webex.sabrhub.com/api/v1/mapping/{mappingId}" \
+              -H "Authorization: Bearer YOUR_TOKEN"
         - lang: Python
           source: |
             import requests
 
-            url = "https://usermgmt.sabrhub.com/v1/mapping/{mappingId}"
-            response = requests.delete(url)
+            url = "https://context-webex.sabrhub.com/api/v1/mapping/{mappingId}"
+            headers = {"Authorization": "Bearer YOUR_TOKEN"}
+            response = requests.delete(url, headers=headers)
             print(response.json())
         - lang: JavaScript
           source: |
-            const url = "https://usermgmt.sabrhub.com/v1/mapping/{mappingId}";
+            const url = "https://context-webex.sabrhub.com/api/v1/mapping/{mappingId}";
 
-            fetch(url, { method: "DELETE" })
+            fetch(url, { 
+              method: "DELETE",
+              headers: { "Authorization": "Bearer YOUR_TOKEN" }
+            })
               .then(res => res.json())
               .then(data => console.log(data))
               .catch(err => console.error("Error:", err));
+
   /users/create:
     post:
       operationId: createCSPUser
       summary: Create a new CSP user and return the created user profile
       description: Create a new CSP user using provided payload. Returns the created user object on success.
-
       tags:
         - CSP-User-Management
       requestBody:
@@ -688,21 +851,18 @@ paths:
                 email:
                   type: string
                   format: email
+                  example: "newuser@email.com"
                 password:
                   type: string
                   format: password
-            examples:
-              user:
-                summary: Example user payload
-                value:
-                  email: "newuser@email.com"
-                  password: "StrongP@ssw0rd"
+                  example: "StrongP@ssw0rd"
       x-codeSamples:
         - lang: cURL
           label: cURL
           source: |
             curl -X POST "https://usermgmt.sabrhub.com/v1/users/create" \
             -H "Content-Type: application/json" \
+            -H "Authorization: Bearer YOUR_TOKEN" \
             -d '{
               "email": "newuser@email.com",
               "password": "StrongP@ssw0rd"
@@ -717,7 +877,10 @@ paths:
                 "email": "newuser@email.com",
                 "password": "StrongP@ssw0rd"
             }
-            headers = {"Content-Type": "application/json"}
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer YOUR_TOKEN"
+            }
 
             response = requests.post(url, json=payload, headers=headers)
             print(response.json())
@@ -733,7 +896,10 @@ paths:
 
             fetch(url, {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: { 
+                "Content-Type": "application/json",
+                "Authorization": "Bearer YOUR_TOKEN"
+              },
               body: JSON.stringify(payload)
             })
               .then(res => res.json())
@@ -749,14 +915,13 @@ paths:
                 properties:
                   id:
                     type: string
+                    example: "user123"
                   email:
                     type: string
+                    example: "newuser@email.com"
         '400':
           description: Bad request – missing or invalid parameters
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
+                $ref: '#/components/schemas/ErrorResponse'
