@@ -1,99 +1,20 @@
-url: https://context-docs.sabrhub.com
-seo:
-  noindex: true   
-  nofollow: true 
-meta:
-  - name: 'robots'
-    content: 'noindex, nofollow, noarchive, nosnippet'
-  - name: 'googlebot'
-    content: 'noindex, nofollow'
-
-# APIs
 apis:
-  webex:
+  webex@v1:
     root: specs/contextsms-webex.yaml
-  teams:
+  teams@v1:
     root: specs/contextsms-teams.yaml
-  contextregister:
+  contextregister@v1:
     root: specs/contextregister.yaml
 
-# Linting rules
+logo:
+  image: ./assets/sabrhub-logo.png
+  altText: Sabrhub
+  link: /
+  favicon: ./assets/sabrhub-favicon.svg
+
 rules:
   no-unused-components: error
-  operation-operationId: error
+  operation-operationId-unique: error
   operation-summary: warn
   operation-description: warn
   tag-description: warn
-
-# Full Sabrhub branding theme
-theme:
-  openapi:
-    # Logo and branding assets
-    logo: assets/sabrhub-logo.png
-    favicon: assets/logos/sabrhub-favicon.png
-    
-    # Custom CSS stylesheet
-    styles:
-      - assets/styles.css
-    
-    # Theme colors and layout
-    theme:
-      colors:
-        primary:
-          main: '#4C86E4'        # Sabrhub Primary Blue
-          light: '#6FA0F2'       # Lighter Blue
-          dark: '#3B6DB8'        # Darker Blue
-        secondary:
-          main: '#1B2B41'        # Sabrhub Navy
-        accent:
-          main: '#00D4AA'        # Sabrhub Teal
-        text:
-          primary: '#1B2B41'     # Main text
-          secondary: '#6B7280'   # Secondary text
-        background:
-          default: '#FFFFFF'     # Main background
-          paper: '#F9FAFB'       # Card background
-        success:
-          main: '#10B981'
-        warning:
-          main: '#F59E0B'
-        error:
-          main: '#EF4444'
-      
-      sidebar:
-        backgroundColor: '#1B2B41'   # Sabrhub Navy
-        textColor: '#FFFFFF'
-        activeTextColor: '#00D4AA'   # Sabrhub accent
-      
-      typography:
-        fontFamily: "'Inter', 'Roboto', 'Helvetica Neue', Arial, sans-serif"
-        fontSize: '16px'
-        lineHeight: 1.6
-        headings:
-          fontFamily: "'Inter', 'Roboto', 'Helvetica Neue', Arial, sans-serif"
-          fontWeight: '600'
-          color: '#1B2B41'
-        code:
-          fontFamily: "'Fira Code', 'Monaco', 'Consolas', monospace"
-          fontSize: '14px'
-          backgroundColor: '#F3F4F6'
-
-# Site metadata
-site:
-  title: 'Sabrhub API Documentation Portal'
-  description: 'Comprehensive API documentation for Sabrhub ContextSMS platform - Webex, Teams, and 10DLC messaging solutions'
-  
-  # Footer branding
-  footer:
-    copyrightText: '© 2024 Sabrhub Inc. All rights reserved.'
-    links:
-      - label: 'Privacy Policy'
-        href: 'https://sabrhub.com/privacy'
-      - label: 'Terms of Service'
-        href: 'https://sabrhub.com/terms'
-      - label: 'Support'
-        href: 'https://support.sabrhub.com'
-      - label: 'Contact'
-        href: 'https://sabrhub.com/contact'
-
-
