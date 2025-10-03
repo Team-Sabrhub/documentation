@@ -3,7 +3,6 @@ info:
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
-  title: ContextSMS Teams Platform API
   version: 1.0.0
   contact:
     name: Sabrhub API Support Team
